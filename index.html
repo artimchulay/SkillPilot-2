@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillPilot - Карьерный помощник</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Единый главный хедер -->
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">🚀 SkillPilot</div>
+                <nav class="nav-links">
+                    <a class="nav-item active" onclick="showScreen('screen-dashboard')">Главная</a>
+                    <a class="nav-item" onclick="showScreen('screen-skills')">Навыки</a>
+                    <a class="nav-item" onclick="showScreen('screen-courses')">Курсы</a>
+                    <a class="nav-item" onclick="showScreen('screen-gamification')">Уровни</a>
+                </nav>
+                <button class="btn theme-btn" onclick="toggleTheme()">🌓 Тема</button>
+            </div>
+        </header>
+
+        <!-- ЭКРАН 1: Главная (Dashboard) -->
+        <main class="screen active" id="screen-dashboard">
+            <div class="main-grid">
+                <div class="left-column">
+                    <div class="gamification-panel card">
+                        <div style="font-size: 1.1em; margin-bottom: 8px;">🎯 Опыт: <span class="user-xp-val">0</span> EXP</div>
+                        <div style="margin-bottom: 8px;">Уровень: <span class="user-level-val">0</span> (<span class="user-rank-val">Junior</span>)</div>
+                        <div style="font-size: 0.95em; color: var(--text-dim);">До следующего уровня: <span id="xpToNextLevel">300</span> EXP</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Оценка навыков</div>
+                            <button class="btn btn-primary" onclick="openSkillEditor('dashboard')">Создать план</button>
+                        </div>
+                        <div id="dashboard-skills-list">
+                            <!-- Рендерится через JS -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Рекомендуемые курсы</div>
+                            <button class="btn" onclick="showScreen('screen-courses')">Все курсы</button>
+                        </div>
+                        <div class="courses-grid" id="dashboard-courses-list">
+                            <div class="course-card" data-course-id="leadership" onclick="startCourse('Продвинутый курс лидерства', 200, 'leadership')">
+                                <div class="course-title">Продвинутый курс лидерства</div>
+                                <div class="course-meta"><span>🕒 8 недель</span><span>⭐ 4.8</span><span>🎯 +200 EXP</span></div>
+                            </div>
+                            <div class="course-card" data-course-id="pm" onclick="startCourse('Профессиональное управление проектами', 150, 'pm')">
+                                <div class="course-title">Профессиональное управление проектами</div>
+                                <div class="course-meta"><span>🕒 6 недель</span><span>⭐ 4.6</span><span>🎯 +150 EXP</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-column">
+                    <div class="card">
+                        <div class="card-header"><div class="card-title">Достижения</div></div>
+                        <div class="badges-grid">
+                            <div class="badge tooltip locked">
+                                <div class="badge-icon">⭐</div>
+                                <div class="badge-name">Быстрый ученик</div>
+                                <span class="tooltip-text">Пройти 3 курса за неделю</span>
+                            </div>
+                            <div class="badge tooltip locked">
+                                <div class="badge-icon">🏆</div>
+                                <div class="badge-name">Топ-исполнитель</div>
+                                <span class="tooltip-text">Набрать 2000 EXP</span>
+                            </div>
+                            <div class="badge tooltip locked">
+                                <div class="badge-icon">🚀</div>
+                                <div class="badge-name">Восходящая звезда</div>
+                                <span class="tooltip-text">Завершить 5 курсов</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- ЭКРАН 2: Навыки -->
+        <main class="screen" id="screen-skills">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Мои навыки</div>
+                    <button class="btn btn-primary" onclick="autoChat('Как мне улучшить навыки?', 'Рекомендую сосредоточиться на развитии лидерства и управления проектами.')">Спросить ИИ</button>
+                </div>
+                <div id="full-skills-list">
+                    <!-- Рендерится через JS -->
+                </div>
+            </div>
+        </main>
+
+        <!-- ЭКРАН 3: Курсы -->
+        <main class="screen" id="screen-courses">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Доступные курсы</div>
+                    <button class="btn btn-primary" onclick="autoChat('Порекомендуй курс...', 'Рекомендую начать с курса: Продвинутый курс лидерства')">Спросить ИИ</button>
+                </div>
+                <div class="courses-grid" id="all-courses-list">
+                    <div class="course-card" data-course-id="leadership" onclick="startCourse('Продвинутый курс лидерства', 200, 'leadership')">
+                        <div class="course-title">Продвинутый курс лидерства</div>
+                        <div class="course-meta"><span>🕒 8 недель</span><span>⭐ 4.8</span><span>🎯 +200 EXP</span></div>
+                    </div>
+                    <div class="course-card" data-course-id="pm" onclick="startCourse('Профессиональное управление проектами', 150, 'pm')">
+                        <div class="course-title">Профессиональное управление проектами</div>
+                        <div class="course-meta"><span>🕒 6 недель</span><span>⭐ 4.6</span><span>🎯 +150 EXP</span></div>
+                    </div>
+                    <div class="course-card" data-course-id="comm" onclick="startCourse('Эффективные коммуникации', 120, 'comm')">
+                        <div class="course-title">Эффективные коммуникации</div>
+                        <div class="course-meta"><span>🕒 4 недели</span><span>⭐ 4.9</span><span>🎯 +120 EXP</span></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- ЭКРАН 4: Уровни -->
+        <main class="screen" id="screen-gamification">
+            <div class="main-grid">
+                <div class="left-column">
+                    <!-- Дорожная карта уровней -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Система уровней</div>
+                            <button class="btn" onclick="showLevelInfo()">Информация</button>
+                        </div>
+                        <div class="level-system">
+                            <p style="font-size: 1.05em; margin-bottom: 14px; font-weight: 500;">Переход от Junior к Lead через развитие и достижение целей</p>
+                            <div class="level-path">
+                                <div class="level-stage">
+                                    <div class="level-circle active-level" onclick="selectLevelRank(0)">J</div>
+                                    <div class="level-label">Junior</div>
+                                </div>
+                                <div class="level-stage">
+                                    <div class="level-circle" onclick="selectLevelRank(1)">M</div>
+                                    <div class="level-label">Middle</div>
+                                </div>
+                                <div class="level-stage">
+                                    <div class="level-circle" onclick="selectLevelRank(2)">S</div>
+                                    <div class="level-label">Senior</div>
+                                </div>
+                                <div class="level-stage">
+                                    <div class="level-circle" onclick="selectLevelRank(3)">TL</div>
+                                    <div class="level-label">Team Lead</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Таблица лидеров -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">🏆 Таблица лидеров</div>
+                        </div>
+                        <div class="leaderboard-horizontal">
+                            <div class="leaderboard-user top-1">
+                                <div class="leaderboard-rank">🥇 1 место</div>
+                                <div class="leaderboard-avatar">👑</div>
+                                <div class="leaderboard-name">Алексей Н.</div>
+                                <div class="leaderboard-xp">2,450 EXP</div>
+                            </div>
+                            <div class="leaderboard-user top-2">
+                                <div class="leaderboard-rank">🥈 2 место</div>
+                                <div class="leaderboard-avatar">🚀</div>
+                                <div class="leaderboard-name">Екатерина С.</div>
+                                <div class="leaderboard-xp">1,890 EXP</div>
+                            </div>
+                            <div class="leaderboard-user top-3">
+                                <div class="leaderboard-rank">🥉 3 место</div>
+                                <div class="leaderboard-avatar">⭐</div>
+                                <div class="leaderboard-name">Дмитрий К.</div>
+                                <div class="leaderboard-xp">1,560 EXP</div>
+                            </div>
+                            <div class="leaderboard-user">
+                                <div class="leaderboard-rank">4 место</div>
+                                <div class="leaderboard-avatar">👤</div>
+                                <div class="leaderboard-name">Вы</div>
+                                <div class="leaderboard-xp" id="userLeaderboardXP">0 EXP</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Челленджи (возвращены) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Рейтинги и челленджи</div>
+                            <button class="btn" onclick="refreshChallenges()">Обновить</button>
+                        </div>
+                        <div class="challenges-grid">
+                            <div class="challenge-card">
+                                <div>
+                                    <div class="challenge-title">Недельный марафон</div>
+                                    <div class="challenge-xp">+100 EXP</div>
+                                </div>
+                                <div class="challenge-checkbox" onclick="toggleChallenge(this, 100)"></div>
+                            </div>
+                            <div class="challenge-card">
+                                <div>
+                                    <div class="challenge-title">Профиль на 100%</div>
+                                    <div class="challenge-xp">+50 EXP</div>
+                                </div>
+                                <div class="challenge-checkbox" onclick="toggleChallenge(this, 50)"></div>
+                            </div>
+                            <div class="challenge-card">
+                                <div>
+                                    <div class="challenge-title">5 курсов за месяц</div>
+                                    <div class="challenge-xp">+200 EXP</div>
+                                </div>
+                                <div class="challenge-checkbox" onclick="toggleChallenge(this, 200)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-column">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Ваши награды</div>
+                            <button class="btn" onclick="openChat()">Спросить ИИ</button>
+                        </div>
+                        <div style="text-align: center; padding: 34px 18px; color: var(--text-dim);">
+                            🎁 Награды появятся здесь после выполнения заданий
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Бейджи достижений</div>
+                        </div>
+                        <div class="badges-grid">
+                            <div class="badge tooltip">
+                                <div class="badge-icon">📊</div>
+                                <div class="badge-name">Профиль на 100%</div>
+                                <span class="tooltip-text">Заполнить профиль на 100%</span>
+                            </div>
+                            <div class="badge tooltip">
+                                <div class="badge-icon">🏅</div>
+                                <div class="badge-name">Эксперт месяца</div>
+                                <span class="tooltip-text">Получить 500 EXP за месяц</span>
+                            </div>
+                            <div class="badge tooltip">
+                                <div class="badge-icon">📚</div>
+                                <div class="badge-name">Активный ученик</div>
+                                <span class="tooltip-text">Проходить курсы регулярно</span>
+                            </div>
+                            <div class="badge tooltip">
+                                <div class="badge-icon">👣</div>
+                                <div class="badge-name">Первые шаги</div>
+                                <span class="tooltip-text">Завершить первый курс</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- МОДАЛЬНЫЕ ОКНА -->
+        <div class="overlay" id="overlay" onclick="closeAllModals()"></div>
+
+        <!-- Модалка завершения курса -->
+        <div class="modal" id="courseCompletionModal">
+            <div class="card-header">
+                <div class="card-title">Завершение курса</div>
+                <button class="btn" onclick="closeModal('courseCompletionModal')">✕</button>
+            </div>
+            <div>
+                <p>Вы завершили курс <strong id="completedCourseName"></strong>?</p>
+                <p style="margin-top: 8px;">Вы получите <strong>+<span id="courseXPReward">0</span> EXP</strong>.</p>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+                <button class="btn" onclick="closeModal('courseCompletionModal')">Отмена</button>
+                <button class="btn btn-primary" onclick="confirmCourseCompletion()">Завершить</button>
+            </div>
+        </div>
+
+        <!-- Модалка выбора уровня навыка -->
+        <div class="modal" id="skillEditModal">
+            <div class="card-header">
+                <div class="card-title">Выбрать уровень навыка</div>
+                <button class="btn" onclick="closeModal('skillEditModal')">✕</button>
+            </div>
+            <p style="margin-bottom: 12px; color: var(--text-dim);" id="editingSkillLabel">Изменение уровня:</p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn" onclick="setSkillLevel(25)">Новичок (25%)</button>
+                <button class="btn" onclick="setSkillLevel(50)">Средний (50%)</button>
+                <button class="btn" onclick="setSkillLevel(75)">Продвинутый (75%)</button>
+                <button class="btn btn-primary" onclick="setSkillLevel(100)">Эксперт (100%)</button>
+            </div>
+        </div>
+
+        <!-- Чат с ИИ -->
+        <div class="ai-chat-widget" onclick="openChat()">🤖 ИИ Помощник</div>
+        <div class="chat-modal" id="chatModal">
+            <div class="card-header">
+                <div>🤖 ИИ Консультант</div>
+                <button class="btn" onclick="closeChat()">✕</button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai-message">Привет! Я ваш ИИ-помощник. Чем могу помочь?</div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Задайте вопрос..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
