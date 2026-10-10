@@ -1,0 +1,278 @@
+/* ТЕМЫ */
+:root.dark {
+    --bg: #0b1220;
+    --card: #0f1724;
+    --muted: #94a3b8;
+    --accent: #7c5cff;
+    --accent-2: #2dd4bf;
+    --glass: rgba(255,255,255,0.04);
+    --glass-2: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.08);
+    --text: #e6eef8;
+    --text-dim: #94a3b8;
+}
+
+:root.light {
+    --bg: #f9f6f0;
+    --card: #fefcf8;
+    --border: #e8dfcb;
+    --muted: #8a8374;
+    --text: #5a5343;
+    --text-dim: #8a8374;
+    --accent: #c9a96e;
+    --accent-2: #b08d57;
+    --glass: rgba(0,0,0,0.04);
+    --glass-2: rgba(0,0,0,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body { 
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+    background: var(--bg); 
+    color: var(--text); 
+    line-height: 1.6; 
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* Карточки */
+.card {
+    background: var(--card);
+    border-radius: 14px; 
+    padding: 22px; 
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.card-title { font-size: 1.2em; font-weight: 700; color: var(--text); }
+
+/* Кнопки */
+.btn {
+    background: var(--glass); 
+    color: var(--text); 
+    border: 1px solid var(--border); 
+    padding: 10px 18px;
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    transition: all .2s ease;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.btn-primary { 
+    background: linear-gradient(90deg, var(--accent), var(--accent-2)); 
+    color: #fff; 
+    border: none; 
+}
+
+/* Хедер */
+.header { 
+    background: var(--card); 
+    border-radius: 14px; 
+    padding: 14px 20px; 
+    margin-bottom: 22px; 
+    border: 1px solid var(--border); 
+}
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo { font-size: 22px; font-weight: 800; color: var(--accent-2); }
+.nav-links { display: flex; gap: 10px; }
+.nav-links a {
+    color: var(--text-dim); 
+    text-decoration: none; 
+    padding: 8px 16px; 
+    border-radius: 10px;
+    cursor: pointer; 
+    font-weight: 600; 
+    transition: all 0.2s ease;
+}
+.nav-links a:hover { background: var(--glass-2); color: var(--text); }
+.nav-links a.active { 
+    background: linear-gradient(90deg, var(--accent), var(--accent-2)); 
+    color: #fff; 
+}
+
+/* Сетка */
+.main-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+
+/* Навыки */
+.skill-item { margin-bottom: 18px; }
+.skill-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.skill-name { font-weight: 700; color: var(--text); }
+.skill-percent { font-weight: 700; color: var(--accent-2); min-width: 48px; text-align: right; }
+.edit-skill { 
+    cursor: pointer; 
+    margin-left: 8px; 
+    padding: 4px 8px; 
+    border-radius: 8px; 
+    background: var(--glass); 
+    border: 1px solid var(--border); 
+}
+.progress-bar { background: var(--glass); border-radius: 10px; height: 10px; overflow: hidden; }
+.progress-fill { 
+    background: linear-gradient(90deg, var(--accent), var(--accent-2)); 
+    height: 100%; 
+    border-radius: 10px; 
+    transition: width .3s ease; 
+}
+
+/* Курсы */
+.courses-grid { display: grid; gap: 14px; }
+.course-card {
+    background: var(--card); 
+    padding: 16px; 
+    border-radius: 12px; 
+    border-left: 4px solid var(--accent);
+    cursor: pointer; 
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    transition: transform .2s ease;
+}
+.course-card:hover { transform: translateY(-3px); }
+.course-title { font-weight: 700; margin-bottom: 6px; }
+.course-meta { display: flex; gap: 12px; color: var(--text-dim); font-size: 0.9em; }
+
+/* Гамификация */
+.gamification-panel {
+    background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(176,141,87,0.08)); 
+    border: 1px solid var(--border);
+}
+
+/* Уровни */
+.level-system { text-align: center; padding: 20px; }
+.level-path {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin: 20px 0;
+    position: relative;
+}
+.level-path::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 12%;
+    right: 12%;
+    height: 3px;
+    background: var(--border);
+    z-index: 1;
+}
+.level-stage { display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 2; }
+.level-circle {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--card); border: 2px solid var(--border);
+    color: var(--text); display: flex; align-items: center; justify-content: center; 
+    font-weight: 700; cursor: pointer; transition: all .2s;
+}
+.level-circle.active-level {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: white;
+    border-color: transparent;
+    transform: scale(1.12);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+.level-label { font-size: 0.9em; font-weight: 600; }
+
+/* Таблица лидеров */
+.leaderboard-horizontal { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.leaderboard-user { 
+    background: var(--card); 
+    padding: 14px; 
+    border-radius: 12px; 
+    text-align: center; 
+    border: 1px solid var(--border); 
+}
+.leaderboard-avatar { 
+    width: 48px; height: 48px; border-radius: 50%; 
+    margin: 0 auto 8px; 
+    background: var(--glass); 
+    display: flex; align-items: center; justify-content: center; font-size: 1.3em; 
+}
+.leaderboard-name { font-weight: 700; margin-bottom: 4px; font-size: 0.95em; }
+.leaderboard-xp { color: var(--accent-2); font-weight: 700; font-size: 0.9em; }
+
+/* Челленджи */
+.challenges-grid { display: grid; gap: 10px; }
+.challenge-card { 
+    background: var(--card); 
+    padding: 14px; 
+    border-radius: 12px; 
+    display: flex; justify-content: space-between; align-items: center; 
+    border: 1px solid var(--border); 
+    border-left: 3px solid var(--accent); 
+}
+.challenge-title { font-weight: 600; }
+.challenge-xp { color: var(--accent-2); font-weight: 700; font-size: 0.9em; }
+.challenge-checkbox { 
+    width: 22px; height: 22px; 
+    border: 2px solid var(--border); 
+    border-radius: 6px; 
+    cursor: pointer; 
+    display: flex; align-items: center; justify-content: center; 
+    font-weight: 700;
+}
+.challenge-checkbox.checked { 
+    background: linear-gradient(90deg, var(--accent), var(--accent-2)); 
+    color: white; 
+    border-color: transparent; 
+}
+
+/* Бейджи */
+.badges-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.badge {
+    background: var(--card); padding: 12px; border-radius: 12px; 
+    text-align: center; border: 1px solid var(--border); position: relative;
+}
+.badge.locked { opacity: 0.6; }
+.badge-icon { font-size: 1.8em; margin-bottom: 4px; }
+.badge-name { font-size: 0.85em; font-weight: 600; }
+
+.tooltip .tooltip-text {
+    display: none; position: absolute; bottom: 110%; left: 50%;
+    transform: translateX(-50%); background: var(--card); padding: 6px 10px;
+    border-radius: 8px; white-space: nowrap; border: 1px solid var(--border);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 0.8em; z-index: 10;
+}
+.tooltip:hover .tooltip-text { display: block; }
+
+/* Модалки и чат */
+.modal, .chat-modal { 
+    display: none; position: fixed; top: 50%; left: 50%; 
+    transform: translate(-50%, -50%); background: var(--card); 
+    border-radius: 14px; padding: 20px; z-index: 1002; 
+    min-width: 380px; max-width: 90vw; border: 1px solid var(--border); 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+.overlay { 
+    display: none; position: fixed; top: 0; left: 0; 
+    width: 100%; height: 100%; background: rgba(0,0,0,0.4); 
+    z-index: 1001; 
+}
+
+.ai-chat-widget { 
+    position: fixed; bottom: 25px; right: 25px; 
+    background: linear-gradient(90deg, var(--accent), var(--accent-2)); 
+    color: white; padding: 12px 22px; border-radius: 50px; 
+    cursor: pointer; font-weight: 700; z-index: 1000; 
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15); 
+}
+
+.chat-messages { height: 260px; overflow-y: auto; padding: 10px; }
+.message { padding: 10px 14px; border-radius: 12px; margin-bottom: 10px; max-width: 80%; }
+.user-message { background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: white; margin-left: auto; }
+.ai-message { background: var(--glass-2); border: 1px solid var(--border); }
+.chat-input { display: flex; padding-top: 12px; gap: 8px; }
+.chat-input input { flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--text); }
+
+@media (max-width: 850px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .leaderboard-horizontal { grid-template-columns: repeat(2, 1fr); }
+    .nav-container { flex-direction: column; gap: 12px; }
+}
