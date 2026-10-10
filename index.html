@@ -10,7 +10,7 @@
     <div id="toast-container"></div>
 
     <div class="container">
-        <!-- Шапка сайта -->
+        <!-- Шапка -->
         <header class="header">
             <div class="nav-container">
                 <div class="logo">🚀 SkillPilot</div>
@@ -22,7 +22,7 @@
                 </nav>
                 <div style="display:flex; gap:10px; align-items:center;">
                     <button type="button" class="btn" onclick="toggleTheme()">🌓 Тема</button>
-                    <button type="button" class="btn btn-reset" onclick="resetProgress()" title="Сбросить всё">🔄 Сброс</button>
+                    <button type="button" class="btn btn-reset" onclick="resetProgress()" title="Сбросить прогресс">🔄 Сброс</button>
                 </div>
             </div>
         </header>
@@ -43,19 +43,19 @@
                         </div>
                     </div>
 
-                    <!-- Карточка выбранного трека -->
+                    <!-- Карточка трека -->
                     <div class="card track-banner" id="trackBanner">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <div>
                                 <span class="track-tag">Карьерный план</span>
                                 <h3 id="trackTitle" style="margin: 6px 0 2px;">Трек не выбран</h3>
-                                <p id="trackDesc" style="font-size: 0.88em; color: var(--text-dim);">Выберите цель через ИИ-наставника, чтобы построить план обучения.</p>
+                                <p id="trackDesc" style="font-size: 0.88em; color: var(--text-dim);">Выберите цель в чате, чтобы получить пошаговый план развития.</p>
                             </div>
                             <button type="button" class="btn btn-primary btn-sm" onclick="startTrackSelection()">Выбрать цель</button>
                         </div>
                     </div>
 
-                    <!-- Цепочка из 7 заданий -->
+                    <!-- 7 Заданий -->
                     <div class="card">
                         <div class="card-header">
                             <div>
@@ -181,7 +181,7 @@
             </div>
         </main>
 
-        <!-- Модалка завершения курса -->
+        <!-- Модалка курса -->
         <div class="modal" id="courseCompletionModal">
             <div class="card-header">
                 <div class="card-title">Завершение курса</div>
@@ -195,7 +195,7 @@
             </div>
         </div>
 
-        <!-- Модалка настройки навыка через шестеренку -->
+        <!-- Модалка навыка -->
         <div class="modal" id="skillEditModal">
             <div class="card-header">
                 <div class="card-title">Оценить уровень навыка</div>
@@ -210,20 +210,23 @@
             </div>
         </div>
 
-        <!-- ПЕРЕМЕЩАЕМЫЙ ЧАТ С ИИ -->
+        <!-- ЧАТ С ГИБРИДНЫМ ИИ -->
         <div class="ai-chat-widget" onclick="openChat()">🤖 ИИ Помощник</div>
         <div class="chat-modal" id="chatModal">
             <div class="chat-drag-header" id="chatDragHeader">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span>🤖</span>
-                    <strong style="font-size:0.95em;">SkillPilot AI (Нейросеть)</strong>
-                    <span style="font-size:0.75em; opacity:0.6;">(зажмите, чтобы двигать ✥)</span>
+                    <strong style="font-size:0.95em;">SkillPilot AI</strong>
+                    <span class="chat-status-pill">🟢 Гибридный ИИ</span>
                 </div>
-                <button type="button" class="btn-close-chat" onclick="closeChat()">✕</button>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <button type="button" class="btn-win-ctrl" onclick="toggleChatMaximize()" title="Развернуть/Свернуть">🗖</button>
+                    <button type="button" class="btn-win-ctrl" onclick="closeChat()" title="Закрыть">✕</button>
+                </div>
             </div>
             <div class="chat-messages" id="chatMessages"></div>
             <div class="chat-input-bar">
-                <input type="text" id="messageInput" placeholder="Задайте любой вопрос нейросети..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <input type="text" id="messageInput" placeholder="Напишите любой вопрос нейросети..." onkeypress="if(event.key==='Enter') sendMessage()">
                 <button type="button" class="btn btn-primary btn-sm" onclick="sendMessage()">Отправить</button>
             </div>
         </div>
