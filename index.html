@@ -2,7 +2,7 @@
 <html lang="ru" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SkillPilot - Карьерный трекер с ИИ</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -13,17 +13,19 @@
         <!-- Шапка -->
         <header class="header">
             <div class="nav-container">
-                <div class="logo">🚀 SkillPilot</div>
+                <div class="header-top-row">
+                    <div class="logo">🚀 SkillPilot</div>
+                    <div class="header-actions">
+                        <button type="button" class="btn btn-header" onclick="toggleTheme()" title="Сменить тему">🌓 Тема</button>
+                        <button type="button" class="btn btn-reset btn-header" onclick="resetProgress()" title="Сбросить всё">🔄 Сброс</button>
+                    </div>
+                </div>
                 <nav class="nav-links">
                     <button type="button" class="nav-item active" onclick="showScreen('screen-dashboard')">Главная</button>
                     <button type="button" class="nav-item" onclick="showScreen('screen-skills')">Навыки</button>
                     <button type="button" class="nav-item" onclick="showScreen('screen-courses')">Курсы</button>
                     <button type="button" class="nav-item" onclick="showScreen('screen-gamification')">Уровни</button>
                 </nav>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <button type="button" class="btn" onclick="toggleTheme()">🌓 Тема</button>
-                    <button type="button" class="btn btn-reset" onclick="resetProgress()" title="Сбросить прогресс">🔄 Сброс</button>
-                </div>
             </div>
         </header>
 
@@ -33,11 +35,11 @@
                 <div class="left-column">
                     <!-- Панель опыта -->
                     <div class="card gamification-panel">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="gamification-header">
                             <div>
-                                <div style="font-size: 1.25em; font-weight:700;">🎯 Опыт: <span class="user-xp-val">0</span> EXP</div>
-                                <div>Ранг: <span class="user-rank-val">Junior</span> (Уровень <span class="user-level-val">0</span>)</div>
-                                <div style="font-size: 0.9em; color: var(--text-dim); margin-top:2px;">До следующего ранга: <span id="xpToNextLevel">300</span> EXP</div>
+                                <div class="user-xp-title">🎯 Опыт: <span class="user-xp-val">0</span> EXP</div>
+                                <div class="user-rank-subtitle">Ранг: <span class="user-rank-val">Junior</span> (Уровень <span class="user-level-val">0</span>)</div>
+                                <div class="next-level-tip">До следующего ранга: <span id="xpToNextLevel">300</span> EXP</div>
                             </div>
                             <div class="stats-badge">🏆 <span id="unlocked-count">0</span>/7 ачивок</div>
                         </div>
@@ -45,13 +47,13 @@
 
                     <!-- Карточка трека -->
                     <div class="card track-banner" id="trackBanner">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="track-banner-inner">
                             <div>
                                 <span class="track-tag">Карьерный план</span>
                                 <h3 id="trackTitle" style="margin: 6px 0 2px;">Трек не выбран</h3>
                                 <p id="trackDesc" style="font-size: 0.88em; color: var(--text-dim);">Выберите цель в чате, чтобы получить пошаговый план развития.</p>
                             </div>
-                            <button type="button" class="btn btn-primary btn-sm" onclick="startTrackSelection()">Выбрать цель</button>
+                            <button type="button" class="btn btn-primary btn-sm track-btn" onclick="startTrackSelection()">Выбрать цель</button>
                         </div>
                     </div>
 
@@ -210,24 +212,24 @@
             </div>
         </div>
 
-        <!-- ЧАТ С ГИБРИДНЫМ ИИ -->
+        <!-- ПЕРЕМЕЩАЕМЫЙ И АДАПТИВНЫЙ ЧАТ -->
         <div class="ai-chat-widget" onclick="openChat()">🤖 ИИ Помощник</div>
         <div class="chat-modal" id="chatModal">
             <div class="chat-drag-header" id="chatDragHeader">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span>🤖</span>
                     <strong style="font-size:0.95em;">SkillPilot AI</strong>
-                    <span class="chat-status-pill">🟢 Гибридный ИИ</span>
+                    <span class="chat-status-pill">🟢 На связи</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:6px;">
-                    <button type="button" class="btn-win-ctrl" onclick="toggleChatMaximize()" title="Развернуть/Свернуть">🗖</button>
+                    <button type="button" class="btn-win-ctrl btn-max-ctrl" onclick="toggleChatMaximize()" title="Развернуть/Свернуть окно">🗖</button>
                     <button type="button" class="btn-win-ctrl" onclick="closeChat()" title="Закрыть">✕</button>
                 </div>
             </div>
             <div class="chat-messages" id="chatMessages"></div>
             <div class="chat-input-bar">
-                <input type="text" id="messageInput" placeholder="Напишите любой вопрос нейросети..." onkeypress="if(event.key==='Enter') sendMessage()">
-                <button type="button" class="btn btn-primary btn-sm" onclick="sendMessage()">Отправить</button>
+                <input type="text" id="messageInput" placeholder="Напишите: 'ало', 'шутка', 'совет', 'задание'..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button type="button" class="btn btn-primary btn-sm chat-send-btn" onclick="sendMessage()">Отправить</button>
             </div>
         </div>
     </div>
