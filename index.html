@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkillPilot - Карьерный помощник</title>
+    <title>SkillPilot - Карьерный трекер с ИИ</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Контейнер для всплывающих ачивок -->
     <div id="toast-container"></div>
 
     <div class="container">
@@ -23,12 +22,12 @@
                 </nav>
                 <div style="display:flex; gap:10px; align-items:center;">
                     <button type="button" class="btn" onclick="toggleTheme()">🌓 Тема</button>
-                    <button type="button" class="btn btn-reset" onclick="resetProgress()" title="Сбросить прогресс">🔄 Сброс</button>
+                    <button type="button" class="btn btn-reset" onclick="resetProgress()" title="Сбросить всё">🔄 Сброс</button>
                 </div>
             </div>
         </header>
 
-        <!-- ЭКРАН 1: Главная (Dashboard) -->
+        <!-- ЭКРАН 1: Главная -->
         <main class="screen active" id="screen-dashboard">
             <div class="main-grid">
                 <div class="left-column">
@@ -44,11 +43,25 @@
                         </div>
                     </div>
 
-                    <!-- Интерактивные задания ИИ -->
+                    <!-- Карточка выбранного трека -->
+                    <div class="card track-banner" id="trackBanner">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <span class="track-tag">Карьерный план</span>
+                                <h3 id="trackTitle" style="margin: 6px 0 2px;">Трек не выбран</h3>
+                                <p id="trackDesc" style="font-size: 0.88em; color: var(--text-dim);">Выберите цель через ИИ-наставника, чтобы построить план обучения.</p>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="startTrackSelection()">Выбрать цель</button>
+                        </div>
+                    </div>
+
+                    <!-- Цепочка из 7 заданий -->
                     <div class="card">
                         <div class="card-header">
-                            <div class="card-title">⚡ Задания от ИИ</div>
-                            <button type="button" id="btn-ai-quests" class="btn btn-sm btn-primary" onclick="generateNewQuests()" style="display:none;">🤖 ИИ: Новые задания</button>
+                            <div>
+                                <div class="card-title">⚡ Стартовые задания (Квесты)</div>
+                                <small style="color:var(--text-dim);">Выполняйте шаги последовательно для быстрого роста</small>
+                            </div>
                         </div>
                         <div class="quests-list" id="quests-list"></div>
                     </div>
@@ -56,13 +69,16 @@
                     <!-- Оценка навыков -->
                     <div class="card">
                         <div class="card-header">
-                            <div class="card-title">Оценка навыков</div>
-                            <button type="button" class="btn btn-primary btn-sm" onclick="openSkillEditor()">План от ИИ</button>
+                            <div>
+                                <div class="card-title">Оценка навыков</div>
+                                <small style="color:var(--text-dim);">Калибруйте навыки через опрос бота</small>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="startSkillAssessment()">План от ИИ</button>
                         </div>
                         <div id="dashboard-skills-list"></div>
                     </div>
 
-                    <!-- Рекомендуемые курсы -->
+                    <!-- Курсы -->
                     <div class="card">
                         <div class="card-header">
                             <div class="card-title">Рекомендуемые курсы</div>
@@ -72,13 +88,11 @@
                     </div>
                 </div>
 
-                <!-- Правая колонка с достижениями -->
+                <!-- Правая колонка с ачивками -->
                 <div class="right-column">
                     <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">🏆 Достижения</div>
-                        </div>
-                        <p style="font-size:0.85em; color:var(--text-dim); margin-bottom:12px;">Открывайте ачивки за любые действия на платформе:</p>
+                        <div class="card-header"><div class="card-title">🏆 Достижения</div></div>
+                        <p style="font-size:0.85em; color:var(--text-dim); margin-bottom:12px;">Открывайте награды за любые действия на сайте:</p>
                         <div class="badges-grid" id="badges-grid"></div>
                     </div>
                 </div>
@@ -90,7 +104,7 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">Все навыки (детально)</div>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="autoChat('Как прокачать навыки?', 'Кликайте на значок ⚙️ возле любого навыка и проходите курсы!')">Спросить ИИ</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="startSkillAssessment()">Оценить с ИИ</button>
                 </div>
                 <div id="full-skills-list"></div>
             </div>
@@ -101,7 +115,7 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">Каталог курсов</div>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="autoChat('Какой курс выбрать?', 'Продвинутый курс лидерства дает рекордные +200 EXP!')">Спросить ИИ</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="autoChat('Какой курс выбрать?', 'Рекомендую курс, отмеченный золотой плашкой вашего плана!')">Спросить ИИ</button>
                 </div>
                 <div class="courses-grid" id="all-courses-list"></div>
             </div>
@@ -111,7 +125,7 @@
         <main class="screen" id="screen-gamification">
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">Карьерный путь</div>
+                    <div class="card-title">Карьерный рост</div>
                     <button type="button" class="btn btn-sm" onclick="showLevelInfo()">Инфо</button>
                 </div>
                 <div class="level-system">
@@ -136,9 +150,8 @@
                 </div>
             </div>
 
-            <!-- Таблица лидеров -->
             <div class="card">
-                <div class="card-header"><div class="card-title">🏆 Топ недели</div></div>
+                <div class="card-header"><div class="card-title">🏆 Топ лидеров недели</div></div>
                 <div class="leaderboard-horizontal">
                     <div class="leaderboard-user top-1">
                         <div>🥇 1 место</div>
@@ -168,51 +181,50 @@
             </div>
         </main>
 
-        <!-- Модальные окна -->
-        <div class="overlay" id="overlay" onclick="closeAllModals()"></div>
-
-        <!-- Окно завершения курса -->
+        <!-- Модалка завершения курса -->
         <div class="modal" id="courseCompletionModal">
             <div class="card-header">
                 <div class="card-title">Завершение курса</div>
                 <button type="button" class="btn btn-sm" onclick="closeModal('courseCompletionModal')">✕</button>
             </div>
             <p>Вы завершили курс <strong id="completedCourseName"></strong>?</p>
-            <p style="margin: 8px 0;">Награда за прохождение: <strong>+<span id="courseXPReward">0</span> EXP</strong>.</p>
+            <p style="margin: 8px 0;">Награда: <strong>+<span id="courseXPReward">0</span> EXP</strong>.</p>
             <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px;">
                 <button type="button" class="btn btn-sm" onclick="closeModal('courseCompletionModal')">Отмена</button>
                 <button type="button" class="btn btn-sm btn-primary" onclick="confirmCourseCompletion()">Забрать опыт</button>
             </div>
         </div>
 
-        <!-- Окно изменения навыка -->
+        <!-- Модалка настройки навыка через шестеренку -->
         <div class="modal" id="skillEditModal">
             <div class="card-header">
-                <div class="card-title">Выбрать уровень навыка</div>
+                <div class="card-title">Оценить уровень навыка</div>
                 <button type="button" class="btn btn-sm" onclick="closeModal('skillEditModal')">✕</button>
             </div>
             <p style="margin-bottom: 12px; color: var(--text-dim);" id="editingSkillLabel">Навык</p>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button type="button" class="btn btn-sm" onclick="setSkillLevel(25)">Новичок (25%)</button>
+                <button type="button" class="btn btn-sm" onclick="setSkillLevel(25)">Базовый (25%)</button>
                 <button type="button" class="btn btn-sm" onclick="setSkillLevel(50)">Средний (50%)</button>
                 <button type="button" class="btn btn-sm" onclick="setSkillLevel(75)">Продвинутый (75%)</button>
                 <button type="button" class="btn btn-sm btn-primary" onclick="setSkillLevel(100)">Эксперт (100%)</button>
             </div>
         </div>
 
-        <!-- ЧАТ С ИИ -->
+        <!-- ПЕРЕМЕЩАЕМЫЙ ЧАТ С ИИ -->
         <div class="ai-chat-widget" onclick="openChat()">🤖 ИИ Помощник</div>
         <div class="chat-modal" id="chatModal">
-            <div class="card-header">
-                <div>🤖 ИИ-наставник SkillPilot</div>
-                <button type="button" class="btn btn-sm" onclick="closeChat()">✕</button>
+            <div class="chat-drag-header" id="chatDragHeader">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span>🤖</span>
+                    <strong style="font-size:0.95em;">SkillPilot AI (Нейросеть)</strong>
+                    <span style="font-size:0.75em; opacity:0.6;">(зажмите, чтобы двигать ✥)</span>
+                </div>
+                <button type="button" class="btn-close-chat" onclick="closeChat()">✕</button>
             </div>
-            <div class="chat-messages" id="chatMessages">
-                <!-- Сообщения генерируются скриптом -->
-            </div>
-            <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Напишите вопрос ИИ..." onkeypress="if(event.key==='Enter') sendMessage()">
-                <button type="button" class="btn btn-primary" onclick="sendMessage()">Отправить</button>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-bar">
+                <input type="text" id="messageInput" placeholder="Задайте любой вопрос нейросети..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button type="button" class="btn btn-primary btn-sm" onclick="sendMessage()">Отправить</button>
             </div>
         </div>
     </div>
