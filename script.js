@@ -28,11 +28,11 @@ const CAREER_TRACKS = {
     }
 };
 
-/* 7 НАЧАЛЬНЫХ ЗАДАНИЙ (ЛОГИЧЕСКАЯ ЦЕПОЧКА) */
+/* 7 НАЧАЛЬНЫХ ЗАДАНИЙ */
 const INITIAL_QUESTS = [
     { id: 'q_track', title: '🎯 Выбрать карьерный трек в чате с ИИ', xp: 40, done: false },
     { id: 'q_skills', title: '📊 Оценить навыки через опрос ИИ', xp: 50, done: false },
-    { id: 'q_ai_ask', title: '💬 Задать любой вопрос реальной нейросети', xp: 30, done: false },
+    { id: 'q_ai_ask', title: '💬 Задать любой вопрос нейросети в чате', xp: 30, done: false },
     { id: 'q_rec_course', title: '📚 Пройти курс, рекомендованный вашим планом', xp: 100, done: false },
     { id: 'q_theme', title: '🌓 Переключить тему оформления', xp: 20, done: false },
     { id: 'q_target_rank', title: '🏆 Кликнуть на ранг Team Lead на карте уровней', xp: 25, done: false },
@@ -42,12 +42,32 @@ const INITIAL_QUESTS = [
 const ALL_ACHIEVEMENTS = [
     { id: 'first_click', name: 'Первопроходец', icon: '👣', desc: 'Перейти на другую вкладку', unlocked: false },
     { id: 'style', name: 'Мастер стиля', icon: '🌓', desc: 'Сменить тему оформления', unlocked: false },
-    { id: 'ai_talk', name: 'Диалог с будущим', icon: '🤖', desc: 'Задать вопрос нейросети', unlocked: false },
+    { id: 'ai_talk', name: 'Диалог с будущим', icon: '🤖', desc: 'Пообщаться с ИИ', unlocked: false },
     { id: 'skill_tune', name: 'Инженер навыков', icon: '⚙️', desc: 'Оценить любой навык', unlocked: false },
     { id: 'expert_100', name: 'Перфекционист', icon: '💯', desc: 'Довести навык до 100%', unlocked: false },
     { id: 'first_course', name: 'Жажда знаний', icon: '📚', desc: 'Завершить 1 курс', unlocked: false },
     { id: 'quest_master', name: 'Квестоман', icon: '🏆', desc: 'Выполнить задания от ИИ', unlocked: false }
 ];
+
+/* 15 РАЗНООБРАЗНЫХ ОТВЕТОВ БОРТОВОГО ДВИЖКА (ПОДХВАТ ПРИ ПЕРЕГРУЗКЕ ОБЛАКА) */
+const AUTONOMOUS_FALLBACK_POOL = [
+    "На связи! Анализирую ваш профиль: текущий ранг уверенный, но для перехода на следующую ступень советую завершить целевой курс.",
+    "Отличная мысль! Главное в карьере IT — не зубрить всё подряд, а закрывать конкретные пробелы в навыках. С чего начнём сегодня?",
+    "Я здесь и готов к работе! Кстати, вы уже успели оценить свои навыки через кнопку «План от ИИ» на главной странице?",
+    "Интересный вопрос! Мой алгоритм подсказывает: чем выше показатель в шкале навыков, тем быстрее откроется путь к Team Lead.",
+    "Принято! Добавил этот фокус в вашу индивидуальную траекторию. Могу предложить конкретное практическое испытание!",
+    "Каждый закрытый курс приближает вас к новому рангу. Не забывайте заглядывать в таблицу лидеров!",
+    "Отличный настрой! В индустрии сейчас особенно ценятся специалисты с развитыми мягкими навыками (Soft Skills) и системным подходом.",
+    "Фиксирую прогресс! Если сомневаетесь, за что браться дальше — пройдите курс, подсвеченный золотой рамкой.",
+    "На связи бортовой наставник! Готов сгенерировать персональный карьерный квест — просто напишите мне об этом.",
+    "Записал в ваш журнал развития. Помните: даже 15 минут регулярного обучения в день дают колоссальный отрыв за месяц!",
+    "Хороший вопрос! Для собеседований на грейд Middle и выше ключевое значение имеет умение объяснять архитектуру своих решений.",
+    "Я на дежурстве! Все системы платформы работают штатно: опыт начисляется, ачивки открываются вовремя.",
+    "Здорово, что вы развиваетесь! Рекомендую кликнуть на ранг Team Lead на карте уровней — за это предусмотрен бонусный опыт.",
+    "Идея супер! Шаг за шагом мы закроем все 7 стартовых квестов. Какой пункт плана выберем следующим?",
+    "Бортовой модуль подтверждает готовность к росту! Давайте проверим, какой навык у вас сейчас прокачан меньше всего."
+];
+let fallbackPoolIndex = 0;
 
 /* СОСТОЯНИЕ */
 const state = {
@@ -185,10 +205,10 @@ function renderQuests() {
     `).join('');
 }
 
-/* ВЫБОР КАРЬЕРНОГО ТРЕКА */
+/* ТРЕК РАЗВИТИЯ */
 function startTrackSelection() {
     openChat();
-    appendMsgWithChips("🎯 Выберите ваш желаемый карьерный трек, чтобы я составил пошаговый план развития:", [
+    appendMsgWithChips("🎯 Выберите желаемый карьерный трек, чтобы я составил индивидуальный план:", [
         { text: '👔 Team Lead', action: () => applyTrack('team_lead') },
         { text: '💻 Tech Lead', action: () => applyTrack('tech_lead') },
         { text: '🚀 Уверенный Middle', action: () => applyTrack('fast_middle') }
@@ -199,14 +219,12 @@ function applyTrack(trackKey) {
     state.selectedTrackKey = trackKey;
     const track = CAREER_TRACKS[trackKey];
 
-    // Обновляем баннер на дашборде
     document.getElementById('trackTitle').textContent = track.name;
     document.getElementById('trackDesc').textContent = track.desc;
 
     completeQuest('q_track');
 
-    // План от ИИ
-    const planText = `🎉 Отличный выбор: ${track.name}!\n\n📋 Ваш персональный план развития:\n1. Оцените навыки в профиле.\n2. Пройдите курс «${getCourseById(track.recCourseId)?.name}» (подсвечен золотом!).\n3. Поднимите ключевой навык до 75%+.`;
+    const planText = `🎉 Трек зафиксирован: ${track.name}!\n\n📋 Пошаговый план развития:\n1. Оцените ваши 4 навыка кнопками в чате.\n2. Пройдите курс «${getCourseById(track.recCourseId)?.name}» (подсвечен золотом!).\n3. Поднимите ключевой навык трека до 75%+.`;
     appendMsg(planText, 'ai-message');
 
     renderCourses();
@@ -296,7 +314,6 @@ function setSkillLevel(percent) {
     unlockAchievement('skill_tune');
     if (percent === 100) unlockAchievement('expert_100');
 
-    // Проверяем квест на 75%+ ключевого навыка
     if (state.selectedTrackKey && state.editingSkillKey === CAREER_TRACKS[state.selectedTrackKey]?.targetSkill && percent >= 75) {
         completeQuest('q_gear_tune');
     }
@@ -305,7 +322,7 @@ function setSkillLevel(percent) {
     renderSkills();
 }
 
-/* ИНТЕРАКТИВНЫЙ ОПРОС ПО НАВЫКАМ */
+/* ОПРОС ПО НАВЫКАМ */
 function startSkillAssessment() {
     openChat();
     appendMsg("Давайте быстро откалибруем ваши 4 навыка! С какого начнём?", 'ai-message');
@@ -340,7 +357,7 @@ function applySkillFromChat(key, val) {
     }
 }
 
-/* ================= НАСТОЯЩИЙ ИИ ЧЕРЕЗ REST API ================= */
+/* ================= УМНЫЙ ГИБРИДНЫЙ ИИ ================= */
 
 function openChat() {
     const modal = document.getElementById('chatModal');
@@ -350,11 +367,12 @@ function openChat() {
         state.botGreeted = true;
         const chatBox = document.getElementById('chatMessages');
         chatBox.innerHTML = '';
-        const welcome = `👋 Привет! Я SkillPilot AI — ваш персональный наставник на базе реальной нейросети.\n\nСейчас ваш опыт: ${state.xp} EXP (${state.ranks[state.currentRankIndex]}).\nЯ помогу составить план, отвечу на любой вопрос или просто поговорю с вами!`;
+        const welcome = `👋 Здравствуйте! Я гибридный ИИ-наставник SkillPilot.\n\nСейчас ваш опыт: ${state.xp} EXP (${state.ranks[state.currentRankIndex]}).\nЯ помогу составить план, отвечу на любые вопросы и выдам карьерные задания!`;
         appendMsgWithChips(welcome, [
             { text: '🎯 Выбрать карьерный трек', action: () => startTrackSelection() },
-            { text: '📊 Оценить мои навыки', action: () => startSkillAssessment() },
-            { text: '💡 Дай совет по карьере', action: () => sendMessageDirect('Дай мне полезный карьерный совет') }
+            { text: '📊 Оценить навыки', action: () => startSkillAssessment() },
+            { text: '⚡ Придумай задание', action: () => processUserQuery('придумай задание') },
+            { text: '💡 Дай совет', action: () => processUserQuery('совет') }
         ]);
     }
 }
@@ -363,15 +381,20 @@ function closeChat() {
     document.getElementById('chatModal').style.display = 'none';
 }
 
-async function sendMessage() {
+function toggleChatMaximize() {
+    const modal = document.getElementById('chatModal');
+    modal.classList.toggle('maximized');
+}
+
+function sendMessage() {
     const input = document.getElementById('messageInput');
     const text = input.value.trim();
     if (!text) return;
-    sendMessageDirect(text);
+    processUserQuery(text);
     input.value = '';
 }
 
-async function sendMessageDirect(text) {
+async function processUserQuery(text) {
     appendMsg(text, 'user-message');
     unlockAchievement('ai_talk');
     completeQuest('q_ai_ask');
@@ -379,40 +402,137 @@ async function sendMessageDirect(text) {
     const loadingId = 'ai-load-' + Date.now();
     appendLoadingMsg(loadingId);
 
+    // 1. Попытка запроса к открытой нейросети Airforce (таймаут 4 сек)
     try {
-        // Запрос к реальной LLM модели (Mistral)
-        const realAnswer = await fetchRealAI(text);
+        const cloudResponse = await fetchAirforceAI(text, 4000);
         removeLoadingMsg(loadingId);
-        appendMsg(realAnswer, 'ai-message');
+        appendMsg(cloudResponse, 'ai-message');
+        return;
     } catch (err) {
+        // 2. Если облако не ответило — мгновенный подхват бортовым движком!
         removeLoadingMsg(loadingId);
-        // Резервный ответ при отсутствии сети
-        appendMsg(`Сейчас у вас ${state.xp} EXP (${state.ranks[state.currentRankIndex]}). Рекомендую следовать выбранному карьерному треку на Главной!`, 'ai-message');
+        const localReply = generateAutonomousAIResponse(text);
+        if (typeof localReply === 'object') {
+            appendMsgWithChips(localReply.text, localReply.chips);
+        } else {
+            appendMsg(localReply, 'ai-message');
+        }
     }
 }
 
-// Запрос к нейросети через POST
-async function fetchRealAI(userPrompt) {
-    const trackInfo = state.selectedTrackKey ? CAREER_TRACKS[state.selectedTrackKey].name : 'Трек еще не выбран';
-    
+// Запрос к открытому шлюзу без ключей и без регистрации
+async function fetchAirforceAI(prompt, timeoutMs) {
+    const trackInfo = state.selectedTrackKey ? CAREER_TRACKS[state.selectedTrackKey].name : 'Не выбран';
     const systemPrompt = `Ты дружелюбный карьерный ИИ-наставник SkillPilot.
-Данные пользователя: ${state.xp} EXP, ранг: ${state.ranks[state.currentRankIndex]}, выбранный трек: ${trackInfo}.
-Отвечай естественно, умно, по-русски, кратко (2-4 предложения). Поддерживай любые темы, давай карьерные советы и мотивируй развиваться.`;
+Пользователь: ${state.xp} EXP, ранг: ${state.ranks[state.currentRankIndex]}, трек: ${trackInfo}.
+Отвечай естественно, умно, по-русски, кратко (2-4 предложения). Поддерживай любые темы.`;
 
-    const response = await fetch('https://text.pollinations.ai/', {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    const response = await fetch('https://api.airforce/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer missing'
+        },
         body: JSON.stringify({
+            model: 'llama-3.1-8b-instruct',
             messages: [
                 { role: 'system', content: systemPrompt },
-                { role: 'user', content: userPrompt }
+                { role: 'user', content: prompt }
             ],
-            model: 'mistral'
-        })
+            temperature: 0.7,
+            max_tokens: 300
+        }),
+        signal: controller.signal
     });
 
-    if (!response.ok) throw new Error('API Error');
-    return await response.text();
+    clearTimeout(timeoutId);
+    if (!response.ok) throw new Error("Airforce unavailable");
+    const data = await response.json();
+    return data.choices[0].message.content.trim();
+}
+
+/* БОРТОВОЙ ДИАЛОГОВЫЙ ДВИЖОК (РЕЗЕРВНЫЙ ПОДХВАТ) */
+function generateAutonomousAIResponse(query) {
+    const q = query.toLowerCase().trim();
+
+    // 1. Вопросы про ИИ и статус
+    if (q.includes('ты настоящий') || q.includes('где ии') || q.includes('ты робот') || q.includes('как работаешь') || q.includes('связь')) {
+        return "⚠️ Внешний облачный канал сейчас занят или ограничен. Я перешёл в режим автономного бортового наставника. Моя база знаний, квесты и карьерные треки полностью активны и работают без сбоев!";
+    }
+
+    // 2. Сленг и приветствия ("ало", "ку", "привет", "здарова")
+    if (q.includes('ало') || q.includes('алло')) {
+        return {
+            text: "Да-да, на связи! 🚀 Чем займемся? Могу выдать свежее карьерное задание или помочь выбрать трек развития.",
+            chips: [
+                { text: '⚡ Придумай задание', action: () => processUserQuery('придумай задание') },
+                { text: '🎯 Выбрать трек', action: () => startTrackSelection() }
+            ]
+        };
+    }
+    if (q.includes('ку') || q.includes('привет') || q.includes('хай') || q.includes('здаров') || q.includes('здорово') || q.includes('добрый')) {
+        return {
+            text: "Приветствую! Готов помочь вам прокачать карьеру до уровня Team Lead. Что вас сейчас интересует?",
+            chips: [
+                { text: '📊 Оценить навыки', action: () => startSkillAssessment() },
+                { text: '💡 Дай совет', action: () => processUserQuery('совет') }
+            ]
+        };
+    }
+
+    // 3. Задание
+    if (q.includes('задани') || q.includes('квест') || q.includes('придумай')) {
+        const tasks = [
+            "🎯 Спецзадание: Перейдите во вкладку «Навыки» и оцените владение кодом на 75%!",
+            "🎯 Спецзадание: Завершите курс по лидерству и заберите рекордные +200 EXP!",
+            "🎯 Спецзадание: Переключите тему оформления сверху на тёмную и обратно!",
+            "🎯 Спецзадание: Откройте вкладку «Уровни» и кликните на ранг Team Lead для получения бонуса!"
+        ];
+        const task = tasks[Math.floor(Math.random() * tasks.length)];
+        return {
+            text: `${task}\n\nВыполняйте прямо сейчас — опыт сразу начислится в профиль!`,
+            chips: [
+                { text: '⚡ Ещё задание', action: () => processUserQuery('придумай задание') },
+                { text: '📊 Оценить навыки', action: () => startSkillAssessment() }
+            ]
+        };
+    }
+
+    // 4. Совет
+    if (q.includes('совет') || q.includes('помоги') || q.includes('как стать') || q.includes('карьер')) {
+        const advices = [
+            "💡 Карьерный совет: На собеседовании говорите языком бизнеса. Не 'я написал функцию', а 'я оптимизировал процесс, сэкономив 20% времени команды'.",
+            "💡 Совет по коду: Читаемый код важнее 'умного'. Если через полгода вы не понимаете собственный скрипт — архитектуру пора упрощать.",
+            "💡 Совет наставника: Чтобы вырасти от Junior до Middle, научитесь самостоятельно декомпозировать большую задачу на 3-4 маленьких шага."
+        ];
+        return advices[Math.floor(Math.random() * advices.length)];
+    }
+
+    // 5. Прогресс
+    if (q.includes('прогресс') || q.includes('опыт') || q.includes('exp') || q.includes('уровен')) {
+        const toNext = Math.max(0, (state.level + 1) * 300 - state.xp);
+        return `📊 Ваша сводка:\n• EXP: ${state.xp}\n• Ранг: ${state.ranks[state.currentRankIndex]}\n• До следующего ранга: ${toNext} EXP.\n• Ачивок разблокировано: ${state.achievements.filter(a=>a.unlocked).length} из 7.`;
+    }
+
+    // 6. Как дела
+    if (q.includes('как дела') || q.includes('как ты')) {
+        return "Работаю на резервных бортовых модулях, но боевой настрой на максимуме! Слежу за вашим прогрессом. А как ваше обучение?";
+    }
+
+    // 7. База из 15 разнообразных ответов
+    const variedReply = AUTONOMOUS_FALLBACK_POOL[fallbackPoolIndex];
+    fallbackPoolIndex = (fallbackPoolIndex + 1) % AUTONOMOUS_FALLBACK_POOL.length;
+
+    return {
+        text: variedReply,
+        chips: [
+            { text: '⚡ Придумай задание', action: () => processUserQuery('придумай задание') },
+            { text: '💡 Дай совет', action: () => processUserQuery('совет') }
+        ]
+    };
 }
 
 function appendMsg(text, cls) {
@@ -453,7 +573,7 @@ function appendLoadingMsg(id) {
     el.id = id;
     el.className = 'message ai-message';
     el.style.fontStyle = 'italic';
-    el.textContent = '🤖 Нейросеть генерирует ответ...';
+    el.textContent = '🤖 ИИ формулирует ответ...';
     box.appendChild(el);
     box.scrollTop = box.scrollHeight;
 }
@@ -472,7 +592,7 @@ function showLevelInfo() {
     autoChat("Как работают уровни?", "Каждые 300 EXP повышают ранг: Junior → Middle → Senior → Team Lead. Опыт начисляется за квесты, курсы и ачивки!");
 }
 
-/* DRAG & DROP ДЛЯ ЧАТА */
+/* DRAG & DROP */
 (function initDraggableChat() {
     let isDragging = false;
     let startX, startY, initialLeft, initialTop;
@@ -483,7 +603,7 @@ function showLevelInfo() {
         if (!header || !modal) return;
 
         header.addEventListener('mousedown', (e) => {
-            if (e.target.classList.contains('btn-close-chat')) return;
+            if (e.target.classList.contains('btn-win-ctrl') || modal.classList.contains('maximized')) return;
             isDragging = true;
             startX = e.clientX;
             startY = e.clientY;
@@ -521,7 +641,7 @@ function resetProgress() {
     state.achievements = JSON.parse(JSON.stringify(ALL_ACHIEVEMENTS));
 
     document.getElementById('trackTitle').textContent = 'Трек не выбран';
-    document.getElementById('trackDesc').textContent = 'Выберите цель через ИИ-наставника, чтобы построить план обучения.';
+    document.getElementById('trackDesc').textContent = 'Выберите цель в чате, чтобы получить пошаговый план развития.';
 
     selectLevelRank(0);
     renderAll();
