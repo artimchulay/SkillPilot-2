@@ -1,50 +1,73 @@
-/* БАЗОВЫЕ КУРСЫ */
+/* КУРСЫ С ПРИВЯЗКОЙ К ТРЕКАМ */
 const DEFAULT_COURSES = [
-    { id: 'c1', name: 'Продвинутый курс лидерства', xp: 200, weeks: '8 нед.', rating: 4.8 },
-    { id: 'c2', name: 'Управление проектами', xp: 150, weeks: '6 нед.', rating: 4.6 },
-    { id: 'c3', name: 'Эффективные коммуникации', xp: 120, weeks: '4 нед.', rating: 4.9 }
+    { id: 'c1', name: 'Продвинутый курс лидерства', xp: 200, weeks: '8 нед.', rating: 4.8, track: 'team_lead' },
+    { id: 'c2', name: 'Профессиональное управление проектами', xp: 150, weeks: '6 нед.', rating: 4.6, track: 'team_lead' },
+    { id: 'c3', name: 'Архитектура и чистый код', xp: 180, weeks: '7 нед.', rating: 4.9, track: 'tech_lead' },
+    { id: 'c4', name: 'Эффективные коммуникации', xp: 120, weeks: '4 нед.', rating: 4.9, track: 'fast_middle' }
 ];
 
-/* 7 БЫСТРЫХ ДОСТИЖЕНИЙ */
+/* КАРЬЕРНЫЕ ТРЕКИ */
+const CAREER_TRACKS = {
+    team_lead: {
+        name: '👔 Team Lead (Руководитель)',
+        desc: 'Фокус на лидерство, управление проектами и собеседования.',
+        targetSkill: 'leadership',
+        recCourseId: 'c1'
+    },
+    tech_lead: {
+        name: '💻 Tech Lead (Архитектор)',
+        desc: 'Фокус на технические навыки до 100% и решение архитектурных задач.',
+        targetSkill: 'tech',
+        recCourseId: 'c3'
+    },
+    fast_middle: {
+        name: '🚀 Уверенный Middle (Быстрый старт)',
+        desc: 'Сбалансированное развитие всех навыков для уверенного роста.',
+        targetSkill: 'pm',
+        recCourseId: 'c4'
+    }
+};
+
+/* 7 НАЧАЛЬНЫХ ЗАДАНИЙ (ЛОГИЧЕСКАЯ ЦЕПОЧКА) */
+const INITIAL_QUESTS = [
+    { id: 'q_track', title: '🎯 Выбрать карьерный трек в чате с ИИ', xp: 40, done: false },
+    { id: 'q_skills', title: '📊 Оценить навыки через опрос ИИ', xp: 50, done: false },
+    { id: 'q_ai_ask', title: '💬 Задать любой вопрос реальной нейросети', xp: 30, done: false },
+    { id: 'q_rec_course', title: '📚 Пройти курс, рекомендованный вашим планом', xp: 100, done: false },
+    { id: 'q_theme', title: '🌓 Переключить тему оформления', xp: 20, done: false },
+    { id: 'q_target_rank', title: '🏆 Кликнуть на ранг Team Lead на карте уровней', xp: 25, done: false },
+    { id: 'q_gear_tune', title: '⚙️ Поднять ключевой навык своего трека до 75%+', xp: 40, done: false }
+];
+
 const ALL_ACHIEVEMENTS = [
     { id: 'first_click', name: 'Первопроходец', icon: '👣', desc: 'Перейти на другую вкладку', unlocked: false },
     { id: 'style', name: 'Мастер стиля', icon: '🌓', desc: 'Сменить тему оформления', unlocked: false },
-    { id: 'ai_talk', name: 'Диалог с будущим', icon: '🤖', desc: 'Задать вопрос ИИ', unlocked: false },
-    { id: 'skill_tune', name: 'Инженер навыков', icon: '⚙️', desc: 'Изменить любой навык', unlocked: false },
+    { id: 'ai_talk', name: 'Диалог с будущим', icon: '🤖', desc: 'Задать вопрос нейросети', unlocked: false },
+    { id: 'skill_tune', name: 'Инженер навыков', icon: '⚙️', desc: 'Оценить любой навык', unlocked: false },
     { id: 'expert_100', name: 'Перфекционист', icon: '💯', desc: 'Довести навык до 100%', unlocked: false },
     { id: 'first_course', name: 'Жажда знаний', icon: '📚', desc: 'Завершить 1 курс', unlocked: false },
     { id: 'quest_master', name: 'Квестоман', icon: '🏆', desc: 'Выполнить задания от ИИ', unlocked: false }
 ];
 
-/* БОЛЬШОЙ ПУЛ ДЛЯ ГЕНЕРАТОРА ЗАДАЧ */
-const QUEST_POOL = [
-    { id: 'q_theme', title: '🌓 Переключить тему оформления', xp: 20 },
-    { id: 'q_skills', title: '👁️ Заглянуть во вкладку «Навыки»', xp: 25 },
-    { id: 'q_ai_ask', title: '💬 Спросить ИИ: "какой прогресс?"', xp: 30 },
-    { id: 'q_gear', title: '⚙️ Настроить любой навык через ⚙️', xp: 35 },
-    { id: 'q_rank', title: '🎯 Кликнуть на ранг Senior во вкладке Уровни', xp: 25 },
-    { id: 'q_course', title: '📚 Завершить любой доступный курс', xp: 50 },
-    { id: 'q_advice', title: '💡 Спросить ИИ: "дай совет дня"', xp: 30 }
-];
-
-/* СОСТОЯНИЕ ПРИЛОЖЕНИЯ */
+/* СОСТОЯНИЕ */
 const state = {
     xp: 0,
     level: 0,
     ranks: ['Junior', 'Middle', 'Senior', 'Team Lead'],
     currentRankIndex: 0,
+    selectedTrackKey: null,
     skills: {
-        leadership: { name: 'Лидерство', percent: 80 },
-        pm: { name: 'Управление проектами', percent: 65 },
-        tech: { name: 'Технические навыки', percent: 90 },
-        interview: { name: 'Проведение собеседований', percent: 50 }
+        leadership: { name: 'Лидерство', percent: 0 },
+        pm: { name: 'Управление проектами', percent: 0 },
+        tech: { name: 'Технические навыки', percent: 0 },
+        interview: { name: 'Проведение собеседований', percent: 0 }
     },
     courses: [...DEFAULT_COURSES],
-    activeQuests: [],
+    quests: JSON.parse(JSON.stringify(INITIAL_QUESTS)),
     achievements: JSON.parse(JSON.stringify(ALL_ACHIEVEMENTS)),
     currentCourse: null,
     editingSkillKey: null,
-    botGreeted: false // флаг первого знакомства
+    botGreeted: false
 };
 
 /* НАВИГАЦИЯ */
@@ -60,16 +83,15 @@ function showScreen(screenId) {
     });
 
     if (screenId !== 'screen-dashboard') unlockAchievement('first_click');
-    if (screenId === 'screen-skills') completeQuestByTitle('Навыки');
 }
 
-/* ПЕРЕКЛЮЧЕНИЕ ТЕМЫ */
+/* ТЕМА */
 function toggleTheme() {
     const html = document.documentElement;
     html.classList.toggle('dark');
     html.classList.toggle('light');
     unlockAchievement('style');
-    completeQuestByTitle('тему');
+    completeQuest('q_theme');
 }
 
 /* ОПЫТ И УРОВНИ */
@@ -88,11 +110,11 @@ function selectLevelRank(index) {
     document.querySelectorAll('.level-circle').forEach((c, idx) => {
         c.classList.toggle('active-level', idx === index);
     });
-    if (index === 2) completeQuestByTitle('Senior');
+    if (index === 3) completeQuest('q_target_rank');
     renderAll();
 }
 
-/* АЧИВКИ С АНИМАЦИЕЙ */
+/* АЧИВКИ С ТОСТ-АНИМАЦИЕЙ */
 function unlockAchievement(achId) {
     const ach = state.achievements.find(a => a.id === achId);
     if (ach && !ach.unlocked) {
@@ -111,7 +133,7 @@ function showAchievementToast(ach) {
     toast.innerHTML = `
         <div class="toast-icon">${ach.icon}</div>
         <div>
-            <div class="toast-title">Достижение разблокировано! (+30 EXP)</div>
+            <div class="toast-title">Достижение получено! (+30 EXP)</div>
             <div class="toast-name">${ach.name}</div>
         </div>
     `;
@@ -135,31 +157,19 @@ function renderAchievements() {
     `).join('');
 
     const count = state.achievements.filter(a => a.unlocked).length;
-    const countElem = document.getElementById('unlocked-count');
-    if (countElem) countElem.textContent = count;
+    document.getElementById('unlocked-count').textContent = count;
 }
 
-/* КВЕСТЫ ОТ ИИ */
-function generateNewQuests() {
-    const shuffled = [...QUEST_POOL].sort(() => 0.5 - Math.random());
-    state.activeQuests = shuffled.slice(0, 4).map(q => ({ ...q, done: false }));
-    renderQuests();
-
-    const btn = document.getElementById('btn-ai-quests');
-    if (btn) btn.style.display = 'none';
-}
-
-function completeQuestByTitle(keyword) {
-    const quest = state.activeQuests.find(q => !q.done && q.title.toLowerCase().includes(keyword.toLowerCase()));
-    if (quest) {
-        quest.done = true;
-        addXP(quest.xp);
+/* КВЕСТЫ */
+function completeQuest(questId) {
+    const q = state.quests.find(item => item.id === questId);
+    if (q && !q.done) {
+        q.done = true;
+        addXP(q.xp);
         renderQuests();
 
-        if (state.activeQuests.every(q => q.done)) {
+        if (state.quests.every(item => item.done)) {
             unlockAchievement('quest_master');
-            const btn = document.getElementById('btn-ai-quests');
-            if (btn) btn.style.display = 'inline-block';
         }
     }
 }
@@ -167,7 +177,7 @@ function completeQuestByTitle(keyword) {
 function renderQuests() {
     const container = document.getElementById('quests-list');
     if (!container) return;
-    container.innerHTML = state.activeQuests.map(q => `
+    container.innerHTML = state.quests.map(q => `
         <div class="quest-item ${q.done ? 'done' : ''}">
             <span>${q.title}</span>
             <span class="quest-reward">${q.done ? '✅ Выполнено' : `+${q.xp} EXP`}</span>
@@ -175,18 +185,53 @@ function renderQuests() {
     `).join('');
 }
 
+/* ВЫБОР КАРЬЕРНОГО ТРЕКА */
+function startTrackSelection() {
+    openChat();
+    appendMsgWithChips("🎯 Выберите ваш желаемый карьерный трек, чтобы я составил пошаговый план развития:", [
+        { text: '👔 Team Lead', action: () => applyTrack('team_lead') },
+        { text: '💻 Tech Lead', action: () => applyTrack('tech_lead') },
+        { text: '🚀 Уверенный Middle', action: () => applyTrack('fast_middle') }
+    ]);
+}
+
+function applyTrack(trackKey) {
+    state.selectedTrackKey = trackKey;
+    const track = CAREER_TRACKS[trackKey];
+
+    // Обновляем баннер на дашборде
+    document.getElementById('trackTitle').textContent = track.name;
+    document.getElementById('trackDesc').textContent = track.desc;
+
+    completeQuest('q_track');
+
+    // План от ИИ
+    const planText = `🎉 Отличный выбор: ${track.name}!\n\n📋 Ваш персональный план развития:\n1. Оцените навыки в профиле.\n2. Пройдите курс «${getCourseById(track.recCourseId)?.name}» (подсвечен золотом!).\n3. Поднимите ключевой навык до 75%+.`;
+    appendMsg(planText, 'ai-message');
+
+    renderCourses();
+}
+
+function getCourseById(id) {
+    return state.courses.find(c => c.id === id);
+}
+
 /* КУРСЫ */
 function renderCourses() {
-    const renderCards = (courses) => courses.map(c => `
-        <div class="course-card" onclick="startCourse('${c.name}', ${c.xp}, '${c.id}')">
-            <div class="course-title">${c.name}</div>
-            <div class="course-meta">
-                <span>🕒 ${c.weeks}</span>
-                <span>⭐ ${c.rating}</span>
-                <span>🎯 +${c.xp} EXP</span>
+    const renderCards = (courses) => courses.map(c => {
+        const isRec = state.selectedTrackKey && c.id === CAREER_TRACKS[state.selectedTrackKey]?.recCourseId;
+        return `
+            <div class="course-card ${isRec ? 'recommended' : ''}" onclick="startCourse('${c.name}', ${c.xp}, '${c.id}')">
+                ${isRec ? '<span class="badge-rec">Рекомендовано планом ⭐</span>' : ''}
+                <div class="course-title">${c.name}</div>
+                <div class="course-meta">
+                    <span>🕒 ${c.weeks}</span>
+                    <span>⭐ ${c.rating}</span>
+                    <span>🎯 +${c.xp} EXP</span>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     const dash = document.getElementById('dashboard-courses-list');
     const all = document.getElementById('all-courses-list');
@@ -204,9 +249,13 @@ function startCourse(name, xp, id) {
 function confirmCourseCompletion() {
     if (!state.currentCourse) return;
     addXP(state.currentCourse.xp);
+
+    if (state.selectedTrackKey && state.currentCourse.id === CAREER_TRACKS[state.selectedTrackKey]?.recCourseId) {
+        completeQuest('q_rec_course');
+    }
+
     state.courses = state.courses.filter(c => c.id !== state.currentCourse.id);
     unlockAchievement('first_course');
-    completeQuestByTitle('курс');
     closeModal('courseCompletionModal');
     state.currentCourse = null;
     renderCourses();
@@ -219,7 +268,7 @@ function renderSkills() {
             <div class="skill-header">
                 <span>${s.name}</span>
                 <div>
-                    <span>${s.percent}%</span>
+                    <span style="${s.percent === 0 ? 'color:var(--text-dim);' : ''}">${s.percent === 0 ? '0% (Не оценён)' : s.percent + '%'}</span>
                     <button type="button" class="edit-skill" onclick="openSkillModal('${key}')">⚙️</button>
                 </div>
             </div>
@@ -243,87 +292,127 @@ function openSkillModal(key) {
 function setSkillLevel(percent) {
     if (!state.editingSkillKey) return;
     state.skills[state.editingSkillKey].percent = percent;
-    addXP(15);
+    addXP(20);
     unlockAchievement('skill_tune');
     if (percent === 100) unlockAchievement('expert_100');
-    completeQuestByTitle('навык');
+
+    // Проверяем квест на 75%+ ключевого навыка
+    if (state.selectedTrackKey && state.editingSkillKey === CAREER_TRACKS[state.selectedTrackKey]?.targetSkill && percent >= 75) {
+        completeQuest('q_gear_tune');
+    }
+
     closeModal('skillEditModal');
     renderSkills();
 }
 
-/* ================= НАСТОЯЩИЙ ИИ + САМОПРЕЗЕНТАЦИЯ ================= */
+/* ИНТЕРАКТИВНЫЙ ОПРОС ПО НАВЫКАМ */
+function startSkillAssessment() {
+    openChat();
+    appendMsg("Давайте быстро откалибруем ваши 4 навыка! С какого начнём?", 'ai-message');
+    askSkillInChat('leadership');
+}
+
+function askSkillInChat(skillKey) {
+    const skill = state.skills[skillKey];
+    appendMsgWithChips(`Каков ваш текущий уровень по навыку «${skill.name}»?`, [
+        { text: 'Базовый (25%)', action: () => applySkillFromChat(skillKey, 25) },
+        { text: 'Средний (50%)', action: () => applySkillFromChat(skillKey, 50) },
+        { text: 'Уверенный (75%)', action: () => applySkillFromChat(skillKey, 75) },
+        { text: 'Эксперт (100%)', action: () => applySkillFromChat(skillKey, 100) }
+    ]);
+}
+
+function applySkillFromChat(key, val) {
+    state.skills[key].percent = val;
+    addXP(25);
+    unlockAchievement('skill_tune');
+    renderSkills();
+
+    const keys = Object.keys(state.skills);
+    const nextIndex = keys.indexOf(key) + 1;
+
+    if (nextIndex < keys.length) {
+        appendMsg(`✅ Сохранено: ${state.skills[key].name} = ${val}%! Следующий:`, 'ai-message');
+        askSkillInChat(keys[nextIndex]);
+    } else {
+        appendMsg(`🎉 Все навыки успешно оценены и отображаются в профиле!`, 'ai-message');
+        completeQuest('q_skills');
+    }
+}
+
+/* ================= НАСТОЯЩИЙ ИИ ЧЕРЕЗ REST API ================= */
 
 function openChat() {
-    openModal('chatModal');
-    
-    // Бот представляется при первом открытии диалога
+    const modal = document.getElementById('chatModal');
+    modal.style.display = 'flex';
+
     if (!state.botGreeted) {
         state.botGreeted = true;
         const chatBox = document.getElementById('chatMessages');
-        chatBox.innerHTML = ''; // очищаем
-        const intro = `👋 Здравствуйте! Я SkillPilot AI — ваш персональный карьерный наставник на базе реальной нейросети.\n\nСейчас ваш статус: ${state.xp} EXP (${state.ranks[state.currentRankIndex]}).\nЯ могу составить план обучения, оценить прогресс или просто поболтать. О чем хотите поговорить?`;
-        appendMsg(intro, 'ai-message');
+        chatBox.innerHTML = '';
+        const welcome = `👋 Привет! Я SkillPilot AI — ваш персональный наставник на базе реальной нейросети.\n\nСейчас ваш опыт: ${state.xp} EXP (${state.ranks[state.currentRankIndex]}).\nЯ помогу составить план, отвечу на любой вопрос или просто поговорю с вами!`;
+        appendMsgWithChips(welcome, [
+            { text: '🎯 Выбрать карьерный трек', action: () => startTrackSelection() },
+            { text: '📊 Оценить мои навыки', action: () => startSkillAssessment() },
+            { text: '💡 Дай совет по карьере', action: () => sendMessageDirect('Дай мне полезный карьерный совет') }
+        ]);
     }
-
-    setTimeout(() => {
-        document.getElementById('messageInput')?.focus();
-    }, 100);
 }
 
 function closeChat() {
-    closeModal('chatModal');
+    document.getElementById('chatModal').style.display = 'none';
 }
 
 async function sendMessage() {
     const input = document.getElementById('messageInput');
     const text = input.value.trim();
     if (!text) return;
-
-    appendMsg(text, 'user-message');
+    sendMessageDirect(text);
     input.value = '';
+}
 
+async function sendMessageDirect(text) {
+    appendMsg(text, 'user-message');
     unlockAchievement('ai_talk');
-    completeQuestByTitle('ИИ');
+    completeQuest('q_ai_ask');
 
-    const loadingId = 'ai-loading-' + Date.now();
+    const loadingId = 'ai-load-' + Date.now();
     appendLoadingMsg(loadingId);
 
     try {
+        // Запрос к реальной LLM модели (Mistral)
         const realAnswer = await fetchRealAI(text);
         removeLoadingMsg(loadingId);
         appendMsg(realAnswer, 'ai-message');
     } catch (err) {
         removeLoadingMsg(loadingId);
-        appendMsg(`Ваш текущий опыт: ${state.xp} EXP (${state.ranks[state.currentRankIndex]}). Я готов помочь вам с карьерным планом и курсами!`, 'ai-message');
+        // Резервный ответ при отсутствии сети
+        appendMsg(`Сейчас у вас ${state.xp} EXP (${state.ranks[state.currentRankIndex]}). Рекомендую следовать выбранному карьерному треку на Главной!`, 'ai-message');
     }
 }
 
+// Запрос к нейросети через POST
 async function fetchRealAI(userPrompt) {
-    const systemInstruction = `Ты дружелюбный ИИ-наставник на платформе SkillPilot. 
-Пользователь имеет: ${state.xp} EXP, ранг: ${state.ranks[state.currentRankIndex]}. 
-Отвечай свободно, по-русски, живо, давай дельные карьерные советы, поддерживай любую беседу. Ответ должен быть емким (2-4 предложения).`;
+    const trackInfo = state.selectedTrackKey ? CAREER_TRACKS[state.selectedTrackKey].name : 'Трек еще не выбран';
+    
+    const systemPrompt = `Ты дружелюбный карьерный ИИ-наставник SkillPilot.
+Данные пользователя: ${state.xp} EXP, ранг: ${state.ranks[state.currentRankIndex]}, выбранный трек: ${trackInfo}.
+Отвечай естественно, умно, по-русски, кратко (2-4 предложения). Поддерживай любые темы, давай карьерные советы и мотивируй развиваться.`;
 
-    const url = `https://text.pollinations.ai/${encodeURIComponent(userPrompt)}?system=${encodeURIComponent(systemInstruction)}&model=mistral`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("API error");
+    const response = await fetch('https://text.pollinations.ai/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt }
+            ],
+            model: 'mistral'
+        })
+    });
+
+    if (!response.ok) throw new Error('API Error');
     return await response.text();
-}
-
-function appendLoadingMsg(id) {
-    const box = document.getElementById('chatMessages');
-    const el = document.createElement('div');
-    el.id = id;
-    el.className = 'message ai-message';
-    el.style.fontStyle = 'italic';
-    el.style.opacity = '0.7';
-    el.textContent = '🤖 ИИ думает...';
-    box.appendChild(el);
-    box.scrollTop = box.scrollHeight;
-}
-
-function removeLoadingMsg(id) {
-    const el = document.getElementById(id);
-    if (el) el.remove();
 }
 
 function appendMsg(text, cls) {
@@ -335,52 +424,110 @@ function appendMsg(text, cls) {
     box.scrollTop = box.scrollHeight;
 }
 
+function appendMsgWithChips(text, chips) {
+    const box = document.getElementById('chatMessages');
+    const el = document.createElement('div');
+    el.className = `message ai-message`;
+    el.textContent = text;
+
+    if (chips && chips.length) {
+        const chipsContainer = document.createElement('div');
+        chipsContainer.className = 'chat-chips';
+        chips.forEach(chip => {
+            const btn = document.createElement('button');
+            btn.className = 'chat-chip';
+            btn.textContent = chip.text;
+            btn.onclick = () => chip.action();
+            chipsContainer.appendChild(btn);
+        });
+        el.appendChild(chipsContainer);
+    }
+
+    box.appendChild(el);
+    box.scrollTop = box.scrollHeight;
+}
+
+function appendLoadingMsg(id) {
+    const box = document.getElementById('chatMessages');
+    const el = document.createElement('div');
+    el.id = id;
+    el.className = 'message ai-message';
+    el.style.fontStyle = 'italic';
+    el.textContent = '🤖 Нейросеть генерирует ответ...';
+    box.appendChild(el);
+    box.scrollTop = box.scrollHeight;
+}
+
+function removeLoadingMsg(id) {
+    document.getElementById(id)?.remove();
+}
+
 function autoChat(q, a) {
     openChat();
     appendMsg(q, 'user-message');
     setTimeout(() => appendMsg(a, 'ai-message'), 350);
 }
 
-function openSkillEditor() {
-    autoChat("Помоги составить план", "Рекомендую начать с закрытия квестов от ИИ на Главной и поднять навык Лидерства до 100%!");
-}
-
 function showLevelInfo() {
-    autoChat("Как работают уровни?", "Каждые 300 EXP повышают ранг: Junior → Middle → Senior → Team Lead. Опыт начисляется за курсы, квесты и ачивки!");
+    autoChat("Как работают уровни?", "Каждые 300 EXP повышают ранг: Junior → Middle → Senior → Team Lead. Опыт начисляется за квесты, курсы и ачивки!");
 }
 
-/* МОДАЛЬНЫЕ ОКНА */
-function openModal(id) {
-    document.getElementById(id).style.display = 'block';
-    document.getElementById('overlay').style.display = 'block';
-}
+/* DRAG & DROP ДЛЯ ЧАТА */
+(function initDraggableChat() {
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
 
-function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
-    const anyOpen = Array.from(document.querySelectorAll('.modal, .chat-modal')).some(m => m.style.display === 'block');
-    if (!anyOpen) document.getElementById('overlay').style.display = 'none';
-}
+    document.addEventListener('DOMContentLoaded', () => {
+        const header = document.getElementById('chatDragHeader');
+        const modal = document.getElementById('chatModal');
+        if (!header || !modal) return;
 
-function closeAllModals() {
-    document.querySelectorAll('.modal, .chat-modal').forEach(m => m.style.display = 'none');
-    document.getElementById('overlay').style.display = 'none';
-}
+        header.addEventListener('mousedown', (e) => {
+            if (e.target.classList.contains('btn-close-chat')) return;
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = modal.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            modal.style.right = 'auto';
+            modal.style.left = `${initialLeft}px`;
+            modal.style.top = `${initialTop}px`;
+        });
 
-/* СБРОС ПРОГРЕССА */
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            modal.style.left = `${initialLeft + (e.clientX - startX)}px`;
+            modal.style.top = `${initialTop + (e.clientY - startY)}px`;
+        });
+
+        document.addEventListener('mouseup', () => { isDragging = false; });
+    });
+})();
+
+/* МОДАЛКИ КУРСОВ И НАВЫКОВ */
+function openModal(id) { document.getElementById(id).style.display = 'block'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+/* СБРОС */
 function resetProgress() {
-    if (!confirm("Сбросить весь опыт, ачивки и квесты на 0?")) return;
-    state.xp = 0;
-    state.level = 0;
-    state.currentRankIndex = 0;
+    if (!confirm("Сбросить весь прогресс, навыки (на 0%), квесты и ачивки?")) return;
+    state.xp = 0; state.level = 0; state.currentRankIndex = 0;
+    state.selectedTrackKey = null;
     state.botGreeted = false;
+    Object.keys(state.skills).forEach(k => state.skills[k].percent = 0);
     state.courses = [...DEFAULT_COURSES];
+    state.quests = JSON.parse(JSON.stringify(INITIAL_QUESTS));
     state.achievements = JSON.parse(JSON.stringify(ALL_ACHIEVEMENTS));
+
+    document.getElementById('trackTitle').textContent = 'Трек не выбран';
+    document.getElementById('trackDesc').textContent = 'Выберите цель через ИИ-наставника, чтобы построить план обучения.';
+
     selectLevelRank(0);
-    generateNewQuests();
     renderAll();
 }
 
-/* ОБЩИЙ РЕНДЕР */
+/* РЕНДЕР */
 function renderAll() {
     document.querySelectorAll('.user-xp-val').forEach(el => el.textContent = state.xp);
     document.querySelectorAll('.user-level-val').forEach(el => el.textContent = state.level);
@@ -392,11 +539,10 @@ function renderAll() {
 
     renderSkills();
     renderCourses();
+    renderQuests();
     renderAchievements();
 }
 
-/* ИНИЦИАЛИЗАЦИЯ */
 document.addEventListener('DOMContentLoaded', () => {
-    generateNewQuests();
     renderAll();
 });
